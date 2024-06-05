@@ -2,6 +2,14 @@ import cv2
 import face_recognition
 import pickle
 import os
+import firebase_admin
+from firebase_admin import credentials
+from firebase_admin import db
+from firebase_admin import storage
+cred = credentials.Certificate("serviceAccountKey.json")
+firebase_admin.initialize_app(cred,{'databaseURL':"https://faceattendencerealtime-12203-default-rtdb.firebaseio.com/",
+                                    'storageBucket':"faceattendencerealtime-12203.appspot.com"})
+ref =db.reference("Emp")
 
 folderpath='images'
 imgpathlist=os.listdir(folderpath)
@@ -10,6 +18,10 @@ imagelist=[]
 for path in imgpathlist:
         imagelist.append(cv2.imread(os.path.join(folderpath,path)))
         Empid.append(os.path.splitext(path)[0])
+        filename=f'{folderpath}/{path}'
+        bucket=storage.bucket()
+        blob=bucket.blob(filename)
+        blob.upload_from_filename(filename)
         #print(path)
 #print(len(imagelist))
 print(Empid)
